@@ -7,7 +7,7 @@ class Team(object):
         
         self.teamNumber = teamNumber
         self.PRConstant = PRConstant
-        self.winrateVSStyles = winrateVSStyles
+        self.winrateVSStyles = winrateVSStyless
         self.repeatPenaltyArr = repeatPenaltyArr
         self.playerHealthArr = playerHealthArr
         self.numOfGamesFinished = numOfGamesFinished

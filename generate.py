@@ -26,10 +26,10 @@ def compute_PR(team1, team2, action1):
     return PR1_picked, PR2_picked, action2
     
     
-def get_reward_next_state(state, action1, repeatPenaltyScaler=10):
+def get_reward_next_state(team1, action1, repeatPenaltyScaler=10):
 
-    team1 = state.team1
-    team2 = state.team2
+    n = team1.numOfGamesFinished
+    team2 = allteams[n]
 
     PR1_picked, PR2_picked, action2 = compute_PR(team1, team2, action1)
 
