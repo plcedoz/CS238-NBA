@@ -1,46 +1,27 @@
 import random
 import numpy as np
 
-from team import Team
 
-
-def compute_PR(team1, team2, action1):
+def compute_PR(team, opponent, action, repeatPenaltyScaler=10):
     
-    #Update the power ratings
-    PRs1=team1.PRConstant-repeatPenaltyScaler*team1.repeatPenaltyArr
-    PRs2=team2.PRConstant-repeatPenaltyScaler*team2.repeatPenaltyArr
+    PR_team = team.PRs[action]-repeatPenaltyScaler*team.repeatPenalty[action]
+    action_opponent = list(opponent.PRs.keys())[np.argmax(list(opponent.PRs.values()))]
+    PR_opponent = opponent.PRs[action_opponent]-repeatPenaltyScaler*opponent.repeatPenalty[action_opponent]
 
-    #UNIMPLEMENTED YET: update with the player injury update
+    #Scale them with (1-win rate) of the opponent vs the style they pick
+    PR_team = PR_team * (1 - opponent.WRs[action])
+    PR_opponent = PR_opponent * (1 - team.WRs[action_opponent])
     
-    PR1_picked = PRs1[action1];
-    action2 = np.argmax(PRs2)
-    PR2_picked = PRs2[action2] #assume opponent always plays their most dominant style at the beginning
+    return PR_team, PR_opponent
 
-    #scale them with (1-win rate) of the opponent vs the style they pick
-    WRs1=team1.winrateVSStyles
-    WRs2=team2.winrateVSStyles
+def get_reward(team, opponent, action):
 
-    PR1_picked = PR1_picked * (1 - WRs2[action1])
-    PR2_picked = PR2_picked * (1 - WRs1[action2])
-    
-    return PR1_picked, PR2_picked, action2
-    
-    
-def get_reward_next_state(team1, action1, repeatPenaltyScaler=10):
-
-    n = team1.numOfGamesFinished
-    team2 = allteams[n]
-
-    PR1_picked, PR2_picked, action2 = compute_PR(team1, team2, action1)
+    PR_team, PR_opponent = compute_PR(team, opponent, action)
 
     #generate the reward by drawing from distribution
-    proba = PR1_picked/(PR1_picked+PR2_picked)
+    proba = PR_team/(PR_team+PR_opponent)
     reward = int(random.random() < proba)
-
-    team1.updateTeam(action1)
-    team2.updateTeam(action2)
-    next_state = State(team1, team2)
     
-    return reward, next_state
+    return reward
 
 
