@@ -38,27 +38,36 @@ class MDP(object):
         team = self.teams[self.team_index]
         opponents_Ids = [Id for Id in self.teams.keys() if Id != self.team_index]
 
+        mean_rewards = []
         for season in range(nb_seasons):
+            rewards = []
             for opponent_Id in opponents_Ids:
                 opponent = self.teams[opponent_Id]
                 current_state = str(tuple(team.repeatPenalty.values()))
                 action = self.choose_action(current_state, epsilon)
+                #action = list(team.PRs.keys())[np.argmax(list(team.PRs.values()))]
                 reward = get_reward(team, opponent, action)
+                rewards.append(reward)
                 team.update(action)
                 next_state = str(tuple(team.repeatPenalty.values()))
                 self.Q.loc[current_state, action] += learning_rate*(reward + self.discount*
                                                                     np.max([self.Q.loc[next_state,next_action] for next_action in
                                                                             self.actions]) - self.Q.loc[current_state, action])
+            mean_rewards.append(np.mean(rewards)*(len(self.teams)-1))
             team.reset()
-    
+            
+        return mean_rewards
     
     
     def choose_action(self, current_state, epsilon):
-        
+
         if random.random() < epsilon:
             action = np.random.choice(["A","B","C"])
         else:
-            action = np.argmax(self.Q.loc[current_state, :])
+            if np.mean(self.Q.loc[current_state, :]) == 0:
+                action = np.random.choice(["A","B","C"])
+            else:
+                action = np.argmax(self.Q.loc[current_state, :])
         
         return action
         

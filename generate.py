@@ -2,7 +2,7 @@ import random
 import numpy as np
 
 
-def compute_PR(team, opponent, action, repeatPenaltyScaler=10):
+def compute_PR(team, opponent, action, repeatPenaltyScaler=100000):
     
     PR_team = team.PRs[action]-repeatPenaltyScaler*team.repeatPenalty[action]
     action_opponent = list(opponent.PRs.keys())[np.argmax(list(opponent.PRs.values()))]
