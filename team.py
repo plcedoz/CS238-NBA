@@ -22,7 +22,7 @@ class Team(object):
         self.repeatPenalty = {'A':0, 'B':0, 'C':0}
     
     
-def get_teams(filename="teams_data.csv"):
+def get_teams(filename="Data/teams_data.csv"):
     
     data = pd.read_csv(filename, header = None).iloc[:,1:7]
     data.columns = ["PRA", "PRB", "PRC", "WRA", "WRB", "WRC"]
